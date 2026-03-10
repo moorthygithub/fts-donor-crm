@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import axios from 'axios';
-import BASE_URL from '@/config/base-url';
-import Cookies from 'js-cookie';
-import { toast } from 'sonner';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import axios from "axios";
+import BASE_URL from "@/config/base-url";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginAuth = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState("");
   const emailInputRef = useRef(null);
   const navigate = useNavigate();
-  
+
   const loadingMessages = [
     "Setting things up for you...",
     "Checking your credentials...",
@@ -48,7 +48,7 @@ const LoginAuth = () => {
 
   // Handle Enter key press
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter' && !isLoading) {
+    if (event.key === "Enter" && !isLoading) {
       handleLogin(event);
     }
   };
@@ -58,61 +58,74 @@ const LoginAuth = () => {
 
     // Validate inputs
     if (!email.trim() || !password.trim()) {
-      toast.error('Please enter both username and password.');
+      toast.error("Please enter both username and password.");
       return;
     }
 
     setIsLoading(true);
 
     const formData = new FormData();
-    formData.append('username', email);
-    formData.append('password', password);
+    formData.append("username", email);
+    formData.append("password", password);
 
     try {
-      const res = await axios.post(`${BASE_URL}/api/loginWithDonorId`, formData);
+      const res = await axios.post(
+        `${BASE_URL}/api/loginWithDonorId`,
+        formData,
+      );
 
       if (res.data.code === 200) {
         if (!res.data.UserInfo || !res.data.UserInfo.token) {
-          toast.error('Login Failed: No token received.');
+          toast.error("Login Failed: No token received.");
           setIsLoading(false);
           return;
         }
 
         const { UserInfo, version, year } = res.data;
-        const isProduction = window.location.protocol === 'https:';
+        const isProduction = window.location.protocol === "https:";
 
         const cookieOptions = {
           expires: 7,
           secure: isProduction,
-          sameSite: 'Strict',
-          path: '/',
+          sameSite: "Strict",
+          path: "/",
         };
 
         // Set all cookies
-        Cookies.set('token', UserInfo.token, cookieOptions);
-        Cookies.set('id', UserInfo.user.id, cookieOptions);
-        Cookies.set('name', UserInfo.user.indicomp_full_name, cookieOptions);
-        Cookies.set('chapter_id', UserInfo.user.chapter_id, cookieOptions);
-        Cookies.set('user_name', UserInfo.user.indicomp_fts_id, cookieOptions);
-        Cookies.set('email', UserInfo.user.indicomp_email, cookieOptions);
-        Cookies.set('token-expire-time', UserInfo?.token_expires_at, cookieOptions);
-        Cookies.set('ver_con', version?.version_panel, cookieOptions);
-        Cookies.set('currentYear', year?.current_year, cookieOptions);
+        Cookies.set("token", UserInfo.token, cookieOptions);
+        Cookies.set("id", UserInfo.user.id, cookieOptions);
+        Cookies.set("name", UserInfo.user.indicomp_full_name, cookieOptions);
+        Cookies.set("chapter_id", UserInfo.user.chapter_id, cookieOptions);
+        Cookies.set("user_name", UserInfo.user.indicomp_fts_id, cookieOptions);
+        Cookies.set("email", UserInfo.user.indicomp_email, cookieOptions);
+        Cookies.set(
+          "token-expire-time",
+          UserInfo?.token_expires_at,
+          cookieOptions,
+        );
+        Cookies.set("ver_con", version?.version_panel, cookieOptions);
+        Cookies.set("currentYear", year?.current_year, cookieOptions);
 
-        const token = Cookies.get('token');
-        const tokenExpireTime = Cookies.get('token-expire-time');
+        const token = Cookies.get("token");
+        const tokenExpireTime = Cookies.get("token-expire-time");
         if (!token && !tokenExpireTime) {
-          throw new Error('Cookies not set properly');
+          throw new Error("Cookies not set properly");
         }
 
-        navigate('/home', { replace: true });
+        navigate("/home", { replace: true });
       } else {
-        toast.error(res.data.message || 'Login Failed: Unexpected response.');
+        toast.error(res.data.message || "Login Failed: Unexpected response.");
         setIsLoading(false);
       }
     } catch (error) {
-      console.error('❌ Login Error:', error.response?.data?.message || error.message);
-      toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
+      console.error(
+        "❌ Login Error:",
+        error.response?.data?.message || error.message,
+      );
+      toast.error(
+        error.response?.data?.message ||
+          "Login failed. Please check your credentials.",
+      );
       setIsLoading(false);
     }
   };
@@ -123,7 +136,6 @@ const LoginAuth = () => {
 
   return (
     <>
-     
       <div className="min-h-screen flex">
         {/* Left Section - Form */}
         <div className="w-full lg:w-1/2 bg-gray-200 flex items-center justify-center px-8 py-12">
@@ -132,17 +144,23 @@ const LoginAuth = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-blue-900 leading-tight mb-6 canela-font">
               Together let's achieve something incredible
             </h1>
-            
+
             {/* Description */}
             <p className="text-gray-700 text-base mb-4 leading-relaxed">
-              This secure area provides Ekal supporters with information on school allocation against their donations, and online transactions made on the ekal.org website.
+              This secure area provides Ekal supporters with information on
+              school allocation against their donations, and online transactions
+              made on the ekal.org website.
             </p>
-            
+
             <p className="text-gray-700 text-base mb-8">
-              If you are an active Ekal donor, but do not have access to MyEkal as yet, please{' '}
-              <Link to="/forgot-password" className="text-orange-500 underline hover:text-orange-600">
+              If you are an active Ekal donor, but do not have access to MyEkal
+              as yet, please{" "}
+              <Link
+                to="/forgot-password"
+                className="text-orange-500 underline hover:text-orange-600"
+              >
                 click here
-              </Link>{' '}
+              </Link>{" "}
               to set your password.
             </p>
 
@@ -151,8 +169,11 @@ const LoginAuth = () => {
             {/* Login Form */}
             <form onSubmit={handleLogin}>
               <div className="mb-6">
-                <label htmlFor="email" className="block text-blue-900 font-semibold mb-2 text-base">
-                  Donor ID or Email Address
+                <label
+                  htmlFor="email"
+                  className="block text-blue-900 font-semibold mb-2 text-base"
+                >
+                  Donor ID
                 </label>
                 <input
                   ref={emailInputRef}
@@ -161,19 +182,22 @@ const LoginAuth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Enter email address"
+                  placeholder="Enter Donor ID"
                   disabled={isLoading}
                   className="w-full px-4 py-3 border border-gray-300 rounded bg-white text-gray-700 placeholder-gray-400 focus:outline-none  focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div className="mb-6">
-                <label htmlFor="password" className="block text-blue-900 font-semibold mb-2 text-base">
+                <label
+                  htmlFor="password"
+                  className="block text-blue-900 font-semibold mb-2 text-base"
+                >
                   Password
                 </label>
                 <div className="relative">
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -209,12 +233,12 @@ const LoginAuth = () => {
                       <span className="text-xs">{loadingMessage}</span>
                     </>
                   ) : (
-                    'Login'
+                    "Login"
                   )}
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate('/forgot-password')}
+                  onClick={() => navigate("/forgot-password")}
                   className="text-gray-600 hover:text-gray-800 underline text-base disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isLoading}
                 >
